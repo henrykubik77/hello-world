@@ -1,0 +1,59 @@
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpQIBAAKCAQEAnwiiajv8bJ4Zo3GIM7Xcqd9mQhNpVRGDbqaXIp+EsPTqCHxo
+bncA6GW4H3qKL3H1U9Jl6W4Hvx0hafVoADhJp+9MhmqFgfKX9/0LosEZ52+dSpuw
+T0QEmeaDjf2672LUWEUcD3wGcOW1htAwMwUEgezo/7UciTwJjikY0WssM8sG2oV+
+K4my3rR8b/Zc5sUKGtKB9GBpzw+6xJX/IndtDQsh2Va5RakJ4+P70Rs/LmTx8yvS
+gSL5BIq3GwRX1WxLZxm4VwaZlr397m9gihuFUXLqm744z+fnKemyBpYy+7VlMl/q
+BYdnD4LaSpy0HKdPFeVIEbh5LqUX8jn8Qsm0ZwIDAQABAoIBAQCVkKZGqOGuOUY9
+e7GviDLeI/bk36KpWY41S0FKU6GUVtGfZ3lDonHdHoT6PeGl21PxICeuUEfCyh+5
+qg3EXyuOX7SlmZqz6rZXiMkfqOG20jaoiyFWes6k+rDwohbjuhugZGaOfYMFPFPr
+VPJvmSFzG57JlcgfnLIT27y2f0eT8LqOV1yHV4RKtrkORamQHPzNH5pnBefbYzpi
+DaTHI4vV3xhRaDkmfVWx9kTHUPAG7GQ0RABp/jxXnfcjU9dzZnSjuzbRG28fVwQ8
+vxujm6+8vrlnjpHL7nMKMlcC5C2XBqqdXaFkztSO0znvZZCEQ7EOqRbY2O8sQXxw
+RkVy4jrBAoGBAM0h2ax4/sBJDxdbAAlmZY3/X7ZBL/+otLRaHP6h/h1+jT1qBkJU
+M19bmDld3u6dAgZYHkRhkpcmOmnzgnwTMuZfxAUpIf7gmyq2E3sYUYpvvsBSWBRA
+8Ee+tpIa5pY1zLuw4vF5DiPOdIplSb2t/t0wDormIXnZ/2SDl54Hr4/HAoGBAMZ4
+XxWEShR67TjVt+EVC29sCWtseprMYed4pf0yUyC9rxbtOIWJHBEAdNWexPrC/E7X
+ltESxdDDTWL7276yHPwRv4dGjipMYSMs+ywnkrurAS7AI4+cyO77/zSMz7IxFqN3
+bWrGqb6sFGKu/pKO6+AZyj0vYPPBDOugKm7oDfZhAoGBAMqRmPFW8stT2lFIDfs6
+YSMegpfqO8oOAZTwQB28PsNFi5iQMOojWC/ctbBA4Ltl1PAK6KjCag5VM+4ZCEwa
+cXNKMrqd6fJWPySodQhj9XHt88LcDhrCHgXbcVNKuVawfiMDBLlMwAfgAvoAGBf1
+0O8AW/wSUhCQlEHgKUNnd5lVAoGAFJV1XxjqSfd51PQtbvWsyvCMhYypppZd7RDR
+PlJS1sl1eE5AF3Fh7M18UI935H4GhvLLHIHy7DTlOMfgQYXdhbMdhx0lL3PeezR2
+FF1CVZ5lsACTb5iWKlsOW9fizptSur9vJKzX/AOC1b1Kf8683fAuzmu0hXNXMLTa
+0cfVcuECgYEAgTvvZ/nGGMJRgyaL2nMuKF6E/j7nPaI0z46cSrsIjxglSvcMELOq
++ZkDx+HiPWvzZ3prIl2sXtDW0Lg2bSUS+yPjtwaXSKE+DdYkmB9ww9CJLr7+gfL9
+TvfQRSA1J2wF/AIxN3GEh755Ueg3jlyn4jIe8Bn0mpy8wq0gWb80q0s=
+-----END RSA PRIVATE KEY-----
+
+reg - 172.31.6.111
+web db - 172.31.12.164
+rhel web db - 172.31.21.174
+
+https://tinyurl.com/t2021s1e1
+
+brooklyn.config:
+  db.user:             db_user
+  db.password:         abcd1234
+  db.name:             web_chat
+services:
+  - type:              mysql-server
+    id:                db
+    brooklyn.config:
+      datastore.creation.script.template.url: 'https://amp-demo-artifacts.s3.eu-west-1.amazonaws.com/java-web-chat.sql'
+  - type:              tomcat-node
+    brooklyn.config:
+      root.war:        'https://amp-demo-artifacts.s3.eu-west-1.amazonaws.com/web-chat-1.0.0-SNAPSHOT.war'
+      catalina.properties:
+        db.user:       $brooklyn:config("db.user")
+        db.password:   $brooklyn:config("db.password")
+        db.connection:
+          $brooklyn:formatString:
+            - "jdbc:%s%s"
+            - $brooklyn:component("db").attributeWhenReady("datastore.url")
+            - $brooklyn:config("db.name")
+			
+
+
+----
+http://ec2-3-238-58-225.compute-1.amazonaws.com:8080/leak-memory.jsp
